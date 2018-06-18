@@ -27,7 +27,7 @@ class Params(params.Params):
 class Hyperparams(hyperparams.Hyperparams):
     pass
 
-class pcafeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
+class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
     metadata = metadata_base.PrimitiveMetadata({
         # Simply an UUID generated once and fixed forever. Generated using "uuid.uuid4()".
         'id': "ef6f3887-b253-4bfd-8b35-ada449efad0c",
