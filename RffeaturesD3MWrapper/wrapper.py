@@ -94,7 +94,7 @@ class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         Outputs : pandas frame with ordered list of original features in first column
         """
 
-        return RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = inputs.iloc[:,-1])
+        return pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
 
 
 if __name__ == '__main__':
