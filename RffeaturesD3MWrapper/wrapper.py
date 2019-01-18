@@ -82,9 +82,9 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         rff_df = d3m_DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
         # first column ('features')
         col_dict = dict(rff_df.metadata.query((metadata_base.ALL_ELEMENTS, 0)))
-        col_dict['structural_type'] = type("1")
+        col_dict['structural_type'] = type("it is a string")
         col_dict['name'] = 'features'
-        col_dict['semantic_types'] = ('http://schema.org/Integer', 'https://metadata.datadrivendiscovery.org/types/Attribute')
+        col_dict['semantic_types'] = ('http://schema.org/Text', 'https://metadata.datadrivendiscovery.org/types/Attribute')
         rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
         
         return CallResult(rff_df)
