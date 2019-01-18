@@ -95,7 +95,7 @@ if __name__ == '__main__':
     input_dataset = container.Dataset.load('file:///vectorizationdata/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
     ds2df_client = DatasetToDataFrame(hyperparams={"dataframe_resource":"0"})
     df = ds2df_client.produce(inputs = input_dataset)   
-    client = rfffeatures(hyperparams={})
+    client = rffeatures(hyperparams={})
     # make sure to read dataframe as string!
     # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
     #frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
