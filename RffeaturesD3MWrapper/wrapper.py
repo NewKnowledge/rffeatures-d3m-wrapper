@@ -15,7 +15,7 @@ from d3m.primitive_interfaces.base import CallResult
 from d3m import container, utils
 from d3m.container import DataFrame as d3m_DataFrame
 from d3m.metadata import hyperparams, base as metadata_base, params
-from d3m.primitives.datasets import DatasetToDataFrame
+from common_primitives import dataset_to_dataframe as DatasetToDataFrame
 
 __author__ = 'Distil'
 __version__ = '3.1.0'
@@ -105,8 +105,8 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
 
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
-    input_dataset = container.Dataset.load('file:///vectorizationdata/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
-    ds2df_client = DatasetToDataFrame(hyperparams={"dataframe_resource":"0"})
+    input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
+    ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"0"})
     df = ds2df_client.produce(inputs = input_dataset)   
     client = rffeatures(hyperparams={})
     # make sure to read dataframe as string!
