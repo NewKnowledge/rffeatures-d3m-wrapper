@@ -106,11 +106,8 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
     input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
-    ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"0"})
-    df = ds2df_client.produce(inputs = input_dataset)   
+    ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"learningData"})
+    df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)  
     client = rffeatures(hyperparams={})
-    # make sure to read dataframe as string!
-    # frame = pandas.read_csv("https://query.data.world/s/10k6mmjmeeu0xlw5vt6ajry05",dtype='str')
-    #frame = pandas.read_csv("https://s3.amazonaws.com/d3m-data/merged_o_data/o_4550_merged.csv",dtype='str')
-    result = client.produce(inputs = df.value)
-    print(result)
+    result = client.produce(inputs = df)
+    print(result.value)
