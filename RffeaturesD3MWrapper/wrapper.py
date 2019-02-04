@@ -19,6 +19,7 @@ from d3m.primitives.datasets import DatasetToDataFrame
 
 __author__ = 'Distil'
 __version__ = '3.0.0'
+__contact__ = 'mailto:numa@newknowledge.io'
 
 Inputs = container.pandas.DataFrame
 Outputs = container.pandas.DataFrame
@@ -27,6 +28,17 @@ class Hyperparams(hyperparams.Hyperparams):
     pass
 
 class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
+    """
+        Perform supervised recursive feature elimination using random forests to generate an ordered
+        list of features 
+        Parameters
+        ----------
+        inputs : Input pandas frame, NOTE: Target column MUST be the last column
+
+        Returns
+        -------
+        Outputs : pandas frame with ordered list of original features in first column
+        """
     metadata = metadata_base.PrimitiveMetadata({
         # Simply an UUID generated once and fixed forever. Generated using "uuid.uuid4()".
         'id': "ef6f3887-b253-4bfd-8b35-ada449efad0c",
@@ -36,6 +48,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         'keywords': ['Rank and score numeric features based on Random Forest and Recursive Feature Elimination'],
         'source': {
             'name': __author__,
+            'contact': __contact__,
             'uris': [
                 # Unstructured URIs.
                 "https://github.com/NewKnowledge/rffeatures-d3m-wrapper",
@@ -52,7 +65,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.distil.rffeatures',
+        'python_path': 'd3m.primitives.feature_selection.rffeatures.Rffeatures',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [
