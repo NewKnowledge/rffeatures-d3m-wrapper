@@ -18,7 +18,7 @@ from d3m.metadata import hyperparams, base as metadata_base, params
 from d3m.primitives.datasets import DatasetToDataFrame
 
 __author__ = 'Distil'
-__version__ = '3.0.0'
+__version__ = '3.1.0'
 __contact__ = 'mailto:numa@newknowledge.io'
 
 Inputs = container.pandas.DataFrame
