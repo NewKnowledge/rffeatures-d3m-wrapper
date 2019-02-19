@@ -119,11 +119,9 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         # add suggested target
         rff_df.append(inputs.iloc[:,-1])
         
-        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
-        extract_client = ExtractColumns(hyperparams={"columns":features})
-        result = extract_client.produce(inputs=inputs)
-
-        return result
+        d3m_rff = d3m_DataFrame(rff_df)
+       
+        return CallResult(d3m_rff)
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
