@@ -118,19 +118,30 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
         
         # set threshold for the top five features
-        bestFeatures = rff_features.iloc[0:5]
+        bestFeatures = rff_features.iloc[0:5].values.tolist()
+        unique_index = pandas.Index(bestFeatures)
+        bestFeatures = [unique_index.get_loc('row') for row in unique_index]
         # add suggested target
-        bestFeatures.append(inputs.iloc[:, -1])
-    
-        # add metadata to the d3m dataframe
-        rff_df = d3m_DataFrame(bestFeatures)
-        col_dict = dict(rff_df.metadata.query((metadata_base.ALL_ELEMENTS, 0)))
-        col_dict['structural_type'] = type("it is a string")
-        col_dict['name'] = 'features'
-        col_dict['semantic_types'] = ('http://schema.org/Text', 'https://metadata.datadrivendiscovery.org/types/Attribute')
-        rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
+        # bestFeatures.append(inputs.iloc[:, -1])
+        bestFeatures.append(inputs.shape[1]-1)
+        print(type(bestFeatures))
+        print(bestFeatures)
+		
+        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
+        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
+        result = extract_client.produce(inputs=inputs)
 
-        return CallResult(rff_df)
+        return result  
+
+        # add metadata to the d3m dataframe
+        #rff_df = d3m_DataFrame(bestFeatures)
+        #col_dict = dict(rff_df.metadata.query((metadata_base.ALL_ELEMENTS, 0)))
+        #col_dict['structural_type'] = type("it is a string")
+        #col_dict['name'] = 'features'
+        #col_dict['semantic_types'] = ('http://schema.org/Text', 'https://metadata.datadrivendiscovery.org/types/Attribute')
+        #rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
+
+        #return CallResult(rff_df)
 
 
         
