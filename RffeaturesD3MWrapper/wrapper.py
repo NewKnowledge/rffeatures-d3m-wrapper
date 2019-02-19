@@ -121,9 +121,9 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         bestFeatures = rff_features.iloc[0:5].values
 	bestFeatures = [row[0] for row in bestFeatures]
         unique_index = pandas.Index(bestFeatures)
-        bestFeatures = [unique_index.get_loc(row) for row in bestFeatures]
+	bestFeatures = [unique_index.get_loc(row) for row in bestFeatures]
         # add suggested target
-        bestFeatures.append(inputs.shape[1]-1)
+        bestFeatures.append(inputs.shape[1]-1) # assuming that the last column is the target column
 		
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
         extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
