@@ -118,38 +118,23 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
         
         # set threshold for the top five features
-        bestFeatures = rff_features.iloc[0:5].values.tolist()
+        bestFeatures = rff_features.iloc[0:5].values
+	bestFeatures = [row[0] for row in bestFeatures]
         unique_index = pandas.Index(bestFeatures)
-        bestFeatures = [unique_index.get_loc('row') for row in unique_index]
+        bestFeatures = [unique_index.get_loc(row) for row in bestFeatures]
         # add suggested target
-        # bestFeatures.append(inputs.iloc[:, -1])
         bestFeatures.append(inputs.shape[1]-1)
-        print(type(bestFeatures))
-        print(bestFeatures)
 		
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
         extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
         result = extract_client.produce(inputs=inputs)
 
-        return result  
-
-        # add metadata to the d3m dataframe
-        #rff_df = d3m_DataFrame(bestFeatures)
-        #col_dict = dict(rff_df.metadata.query((metadata_base.ALL_ELEMENTS, 0)))
-        #col_dict['structural_type'] = type("it is a string")
-        #col_dict['name'] = 'features'
-        #col_dict['semantic_types'] = ('http://schema.org/Text', 'https://metadata.datadrivendiscovery.org/types/Attribute')
-        #rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
-
-        #return CallResult(rff_df)
-
-
+        return result
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
     input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
     ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"learningData"})
-    # df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)
     df = ds2df_client.produce(inputs = input_dataset)  
     client = rffeatures(hyperparams={})
     result = client.produce(inputs = df.value)
