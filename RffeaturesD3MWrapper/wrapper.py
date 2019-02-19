@@ -115,8 +115,12 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         Outputs : pandas frame with ordered list of original features in first column
         """
         # generate feature ranking
-        return pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
-
+        rff_df = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
+        # add suggested target
+        rff_df.append(inputs.iloc[:,-1])
+        
+        return rff_df
+        
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
     input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
