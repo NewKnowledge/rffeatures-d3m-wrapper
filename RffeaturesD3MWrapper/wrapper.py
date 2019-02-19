@@ -116,19 +116,18 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         """
         # generate feature ranking
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
-        
         # set threshold for the top five features
         bestFeatures = rff_features.iloc[0:5].values
-	bestFeatures = [row[0] for row in bestFeatures]
+        bestFeatures = [row[0] for row in bestFeatures]
         unique_index = pandas.Index(bestFeatures)
-	bestFeatures = [unique_index.get_loc(row) for row in bestFeatures] # get integer location for each label
+        bestFeatures = [unique_index.get_loc(row) for row in bestFeatures] # get integer location for each label
         # add suggested target
         bestFeatures.append(inputs.shape[1]-1) # assuming that the last column is the target column
-		
+        
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
         extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
         result = extract_client.produce(inputs=inputs)
-
+        
         return result
         
 if __name__ == '__main__':
