@@ -115,19 +115,24 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         Outputs : pandas frame with ordered list of original features in first column
         """
         # generate feature ranking
-        rff_df = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
+        rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
         
         # set threshold for the top five features
-        bestFeatures = rff_df.iloc[0:5]
+        bestFeatures = rff_features.iloc[0:5]
         # add suggested target
         bestFeatures.append(inputs.iloc[:, -1])
-        
-        # drop all rows below threshold value
-        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
-        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
-        result = extract_client.produce(inputs=inputs)
-       
-        return result
+    
+        # add metadata to the d3m dataframe
+        rff_df = d3m_DataFrame(bestFeatures)
+        col_dict = dict(rff_df.metadata.query((metadata_base.ALL_ELEMENTS, 0)))
+        col_dict['structural_type'] = type("it is a string")
+        col_dict['name'] = 'features'
+        col_dict['semantic_types'] = ('http://schema.org/Text', 'https://metadata.datadrivendiscovery.org/types/Attribute')
+        rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
+
+        return CallResult(rff_df)
+
+
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
