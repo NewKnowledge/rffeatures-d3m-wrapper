@@ -119,7 +119,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         # add suggested target
         rff_df.append(inputs.iloc[:,-1])
         
-        return rff_df
+        return CallResult(rff_df)
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
@@ -128,4 +128,4 @@ if __name__ == '__main__':
     df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)  
     client = rffeatures(hyperparams={})
     result = client.produce(inputs = df)
-    print(result)
+    print(result.value)
