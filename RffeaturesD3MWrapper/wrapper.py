@@ -117,7 +117,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         # generate feature ranking
         rff_df = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
         
-        #rff_df = RFFeatures().rank_features(inputs=inputs, targets=targets, columns=['features'])
+        # set threshold for the top five features
         bestFeatures = rff_df.iloc[0:5]
         # add suggested target
         bestFeatures.append(inputs.iloc[:, -1])
