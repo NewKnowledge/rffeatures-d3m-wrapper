@@ -121,7 +121,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         bestFeatures = rff_features.iloc[0:5].values
 	bestFeatures = [row[0] for row in bestFeatures]
         unique_index = pandas.Index(bestFeatures)
-	bestFeatures = [unique_index.get_loc(row) for row in bestFeatures]
+	bestFeatures = [unique_index.get_loc(row) for row in bestFeatures] # get integer location for each label
         # add suggested target
         bestFeatures.append(inputs.shape[1]-1) # assuming that the last column is the target column
 		
