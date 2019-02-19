@@ -116,18 +116,25 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         """
         # generate feature ranking
         rff_df = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
-        # add suggested target
-        rff_df.append(inputs.iloc[:,-1])
         
-        d3m_rff = d3m_DataFrame(rff_df)
+        #rff_df = RFFeatures().rank_features(inputs=inputs, targets=targets, columns=['features'])
+        bestFeatures = rff_df.iloc[0:5]
+        # add suggested target
+        bestFeatures.append(inputs.iloc[:, -1])
+        
+        # drop all rows below threshold value
+        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
+        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
+        result = extract_client.produce(inputs=inputs)
        
-        return CallResult(d3m_rff)
+        return result
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
     input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
     ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"learningData"})
-    df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)  
+    # df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)
+    df = ds2df_client.produce(inputs = input_dataset)  
     client = rffeatures(hyperparams={})
-    result = client.produce(inputs = df)
+    result = client.produce(inputs = df.value)
     print(result.value)
