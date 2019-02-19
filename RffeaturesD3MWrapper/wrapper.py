@@ -128,4 +128,4 @@ if __name__ == '__main__':
     df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)  
     client = rffeatures(hyperparams={})
     result = client.produce(inputs = df)
-    print(result.value)
+    print(result)
