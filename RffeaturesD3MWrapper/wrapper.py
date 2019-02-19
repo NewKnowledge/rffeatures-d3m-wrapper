@@ -79,7 +79,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         super().__init__(hyperparams=hyperparams, random_seed=random_seed)
                
      
-    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
+    def produce_metafeatures(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
         Perform supervised recursive feature elimination using random forests to generate an ordered
         list of features 
@@ -101,7 +101,21 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
         
         return CallResult(rff_df)
+    
+    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
+        """
+        Perform supervised recursive feature elimination using random forests to generate an ordered
+        list of features 
+        Parameters
+        ----------
+        inputs : Input pandas frame, NOTE: Target column MUST be the last column
 
+        Returns
+        -------
+        Outputs : pandas frame with ordered list of original features in first column
+        """
+        # generate feature ranking
+        return pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
 
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
