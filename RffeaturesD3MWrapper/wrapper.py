@@ -123,8 +123,8 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         inputs_numeric = [x for x in inputs_numeric if x not in inputs_primary_key]
         # generate feature ranking
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_numeric], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
-        # set threshold for the top five features
-        bestFeatures = rff_features.iloc[0:5].values
+        # set threshold for the top seven features
+        bestFeatures = rff_features.iloc[0:7].values
         bestFeatures = [row[0] for row in bestFeatures]
         bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
         # add suggested target
