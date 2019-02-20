@@ -1,7 +1,7 @@
 {
-   "id":"513b4754-3383-41ef-910f-6bb6a3e3788d",
+   "id":"ee087f4b-eea0-4e1f-9f84-403393b5b137",
    "schema":"https://metadata.datadrivendiscovery.org/schemas/v0/pipeline.json",
-   "created":"2019-02-19T23:20:07.572702Z",
+   "created":"2019-02-20T20:29:35.945023Z",
    "context":"TESTING",
    "inputs":[
       {
@@ -43,7 +43,7 @@
             "version":"3.1.1",
             "python_path":"d3m.primitives.feature_selection.rffeatures.Rffeatures",
             "name":"RF Features",
-            "digest":"23d65537607842352114e488b68412ff82bd07c0d2d341809148e41d8198ac62"
+            "digest":"f287ab677cabbbf92bfd13711ca5175826888b5949cc78f1a20250bc389a7124"
          },
          "arguments":{
             "inputs":{
@@ -170,5 +170,5 @@
          ]
       }
    ],
-   "digest":"962a1cc390038d4e3d401ee4c26e1b22660a67c689a50e2fdccffcb9ea409e3b"
+   "digest":"27cd58c0ffff7084b011d11aa12d1c0b5b2a08ab4e70eb2ffabb40924508ea5b"
 }
