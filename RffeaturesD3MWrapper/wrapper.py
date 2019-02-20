@@ -18,8 +18,8 @@ from d3m.metadata import hyperparams, base as metadata_base, params
 from common_primitives import dataset_to_dataframe as DatasetToDataFrame
 
 __author__ = 'Distil'
-__version__ = '3.1.0'
-__contact__ = 'mailto:numa@newknowledge.io'
+__version__ = '3.1.1'
+__contact__ = 'mailto:nklabs@newknowledge.io'
 
 Inputs = container.pandas.DataFrame
 Outputs = container.pandas.DataFrame
@@ -79,7 +79,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         super().__init__(hyperparams=hyperparams, random_seed=random_seed)
                
      
-    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
+    def produce_metafeatures(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
         Perform supervised recursive feature elimination using random forests to generate an ordered
         list of features 
@@ -101,13 +101,40 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         rff_df.metadata = rff_df.metadata.update((metadata_base.ALL_ELEMENTS, 0), col_dict)
         
         return CallResult(rff_df)
+    
+    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
+        """
+        Perform supervised recursive feature elimination using random forests to generate an ordered
+        list of features 
+        Parameters
+        ----------
+        inputs : Input pandas frame, NOTE: Target column MUST be the last column
 
-
+        Returns
+        -------
+        Outputs : pandas frame with ordered list of original features in first column
+        """
+        # generate feature ranking
+        rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
+        # set threshold for the top five features
+        bestFeatures = rff_features.iloc[0:5].values
+        bestFeatures = [row[0] for row in bestFeatures]
+        unique_index = pandas.Index(bestFeatures)
+        bestFeatures = [unique_index.get_loc(row) for row in bestFeatures] # get integer location for each label
+        # add suggested target
+        bestFeatures.append(inputs.shape[1]-1) # assuming that the last column is the target column
+        
+        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
+        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
+        result = extract_client.produce(inputs=inputs)
+        
+        return result
+        
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING
-    input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/196_autoMpg/196_autoMpg_dataset/datasetDoc.json') 
+    input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/38_sick/38_sick_dataset/datasetDoc.json') 
     ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"learningData"})
-    df = d3m_DataFrame(ds2df_client.produce(inputs = input_dataset).value)  
+    df = ds2df_client.produce(inputs = input_dataset)  
     client = rffeatures(hyperparams={})
-    result = client.produce(inputs = df)
+    result = client.produce(inputs = df.value)
     print(result.value)
