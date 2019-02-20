@@ -25,6 +25,8 @@ Inputs = container.pandas.DataFrame
 Outputs = container.pandas.DataFrame
 
 class Hyperparams(hyperparams.Hyperparams):
+    num_features = hyperparams.UniformInt(lower=1, upper=100, default=5, semantic_types = ['https://metadata.datadrivendiscovery.org/types/TuningParameter'],
+    description = 'number of features to rank')
     pass
 
 class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
@@ -114,6 +116,11 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         -------
         Outputs : pandas frame with ordered list of original features in first column
         """
+
+        if not self.hyperparams:
+            self.hyperparams['num_features'] = 5
+        num_features = self.hyperparams['num_features']        
+
         # extract numeric columns and suggested target
         inputs_float = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Float')
         inputs_integer = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Integer')
@@ -124,7 +131,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         # generate feature ranking
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_numeric], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
         # set threshold for the top seven features
-        bestFeatures = rff_features.iloc[0:7].values
+        bestFeatures = rff_features.iloc[0:num_features].values
         bestFeatures = [row[0] for row in bestFeatures]
         bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
         # add suggested target
@@ -142,6 +149,6 @@ if __name__ == '__main__':
     input_dataset = container.Dataset.load('file:///home/datasets/seed_datasets_current/38_sick/38_sick_dataset/datasetDoc.json') 
     ds2df_client = DatasetToDataFrame.DatasetToDataFramePrimitive(hyperparams={"dataframe_resource":"learningData"})
     df = ds2df_client.produce(inputs = input_dataset)  
-    client = rffeatures(hyperparams={})
+    client = rffeatures(hyperparams={'num_features':5})
     result = client.produce(inputs = df.value)
     print(result.value)
