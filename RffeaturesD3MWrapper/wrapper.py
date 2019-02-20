@@ -114,16 +114,23 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         -------
         Outputs : pandas frame with ordered list of original features in first column
         """
+        # extract numeric columns and suggested target
+        inputs_float = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Float')
+        inputs_integer = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Integer')
+        inputs_primary_key = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/PrimaryKey')
+        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/SuggestedTarget')
+        inputs_numeric = [*inputs_float, *inputs_integer]
+        inputs_numeric = [x for x in inputs_numeric if x not in inputs_primary_key]
         # generate feature ranking
-        rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:,:-1], targets = pandas.DataFrame(inputs.iloc[:,-1])), columns=['features'])
+        rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_numeric], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
         # set threshold for the top five features
         bestFeatures = rff_features.iloc[0:5].values
         bestFeatures = [row[0] for row in bestFeatures]
-        unique_index = pandas.Index(bestFeatures)
-        bestFeatures = [unique_index.get_loc(row) for row in bestFeatures] # get integer location for each label
+        bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
         # add suggested target
-        bestFeatures.append(inputs.shape[1]-1) # assuming that the last column is the target column
-        
+        bestFeatures = [*bestFeatures, *inputs_target]
+     
+        # drop all values below threshold value   
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
         extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
         result = extract_client.produce(inputs=inputs)
