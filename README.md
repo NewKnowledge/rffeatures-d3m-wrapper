@@ -6,7 +6,7 @@ The base library can be found here: https://github.com/NewKnowledge/punk.
 
 ## Install
 
-pip3 install -e git+https://github.com/NewKnowledge/rffeatures-d3m-wrapper.git#egg=RffeaturesD3MWrapper --process-dependency-links
+`pip3 install -e git+https://github.com/NewKnowledge/rffeatures-d3m-wrapper.git#egg=RffeaturesD3MWrapper`
 
 ## Output
 
