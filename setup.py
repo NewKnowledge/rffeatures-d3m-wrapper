@@ -9,8 +9,6 @@ setup(name='RffeaturesD3MWrapper',
         "requests >= 2.18.4, <= 2.20.0",
         "typing",
         "punk==3.0.0"],
-    dependency_links=[
-    ],
     entry_points = {
         'd3m.primitives': [
             'feature_selection.rffeatures.Rffeatures = RffeaturesD3MWrapper:rffeatures'
