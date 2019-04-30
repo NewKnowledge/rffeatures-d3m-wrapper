@@ -85,7 +85,7 @@
             "version":"2019.4.4",
             "python_path":"d3m.primitives.data_cleaning.imputer.SKlearn",
             "name":"sklearn.impute.SimpleImputer",
-            "digest":"d7d1c2bd5b669ac4a01334504f92f970fab4bb10e62755a2081f843ae8829796"
+            "digest":"8c36c71cc0018d0566008dd256748672a4d686bf00174f2c17ae063238be7b29"
          },
          "arguments":{
             "inputs":{
