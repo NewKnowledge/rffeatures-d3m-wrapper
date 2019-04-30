@@ -82,7 +82,7 @@
          "type":"PRIMITIVE",
          "primitive":{
             "id":"d016df89-de62-3c53-87ed-c06bb6a23cde",
-            "version":"v2019.4.4",
+            "version":"2019.4.4",
             "python_path":"d3m.primitives.data_cleaning.imputer.SKlearn",
             "name":"sklearn.impute.SimpleImputer",
             "digest":"d7d1c2bd5b669ac4a01334504f92f970fab4bb10e62755a2081f843ae8829796"
@@ -113,7 +113,7 @@
          "type":"PRIMITIVE",
          "primitive":{
             "id":"1dd82833-5692-39cb-84fb-2455683075f3",
-            "version":"v2019.4.4",
+            "version":"2019.4.4",
             "python_path":"d3m.primitives.classification.random_forest.SKlearn",
             "name":"sklearn.ensemble.forest.RandomForestClassifier",
             "digest":"7ea6cf52c696329ea9270dfc9d1cea219de388b5714ad850c6a055bd9b699ed9"
