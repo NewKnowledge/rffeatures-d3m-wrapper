@@ -116,7 +116,7 @@
             "version":"2019.4.4",
             "python_path":"d3m.primitives.classification.random_forest.SKlearn",
             "name":"sklearn.ensemble.forest.RandomForestClassifier",
-            "digest":"7ea6cf52c696329ea9270dfc9d1cea219de388b5714ad850c6a055bd9b699ed9"
+            "digest":"b1c373d38eeffe7ca7e2fe12b7cae22b2518b9bef3cbf4c7b9167af3a972bee3"
          },
          "arguments":{
             "inputs":{
