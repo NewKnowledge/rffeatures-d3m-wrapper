@@ -64,7 +64,7 @@
             "version":"0.5.0",
             "python_path":"d3m.primitives.data_transformation.column_parser.DataFrameCommon",
             "name":"Parses strings into their types",
-            "digest":"fd9ba65a05a5fae4ab1536f385656099dbe3b42670e7353124379157bf14803b"
+            "digest":"c5b0ded0d7cea33aa7a271fabd52627ef2effb57ee8ad71fadc0daccac6ca50f"
          },
          "arguments":{
             "inputs":{
