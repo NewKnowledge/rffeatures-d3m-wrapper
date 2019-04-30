@@ -22,7 +22,7 @@
             "version":"0.3.0",
             "python_path":"d3m.primitives.data_transformation.dataset_to_dataframe.Common",
             "name":"Extract a DataFrame from a Dataset",
-            "digest":"b1c248751b314d78349de9c5590f3e970e1c5514b78a90707f4dc267c4ca7bf1"
+            "digest":"f1497259d6053892263c069df6d0d08af1d6312b3934649b02bd5fead9777497"
          },
          "arguments":{
             "inputs":{
