@@ -151,7 +151,7 @@
             "version":"0.3.0",
             "python_path":"d3m.primitives.data_transformation.construct_predictions.DataFrameCommon",
             "name":"Construct pipeline predictions output",
-            "digest":"a16e280fce14ef80dba3035c1dbf0e2571fe7d02acd95b05f2787fd1886484e4"
+            "digest":"102c48b3fceda217e3a217626f888803ad347875bede408fb8ab612b6a6be107"
          },
          "arguments":{
             "inputs":{
