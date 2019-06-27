@@ -7,10 +7,10 @@ import ast
 import typing
 from json import JSONDecoder
 from typing import List
-
+import sys
 from punk.feature_selection import RFFeatures
 from d3m.primitive_interfaces.transformer import TransformerPrimitiveBase
-from d3m.primitive_interfaces.base import CallResult
+from d3m.primitive_interfaces.base import PrimitiveBase, CallResult
 
 from d3m import container, utils
 from d3m.container import DataFrame as d3m_DataFrame
@@ -23,6 +23,9 @@ __contact__ = 'mailto:nklabs@newknowledge.io'
 
 Inputs = container.pandas.DataFrame
 Outputs = container.pandas.DataFrame
+
+class Params(params.Params):
+    pass
 
 class Hyperparams(hyperparams.Hyperparams):
     proportion_of_features = hyperparams.Uniform(lower = 0.0, upper = 1.0, default = 0.0, 
@@ -83,8 +86,61 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
     
     def __init__(self, *, hyperparams: Hyperparams, random_seed: int = 0)-> None:
         super().__init__(hyperparams=hyperparams, random_seed=random_seed)
-               
+        self.rff_features = None
+        self.num_features = None
+        self.bestFeatures = None
+
+    def fit(self, *, timeout: float = None, iterations: int = None) -> CallResult[None]:
+        '''
+        fits rffeatures feature selection algorithm on the training set. applies same feature selection to test set
+        for consistency with downstream classifiers
+        '''  
+        # set threshold for top features
+        self.bestFeatures = self.rff_features.iloc[0:self.num_features].values
+        self.bestFeatures = [row[0] for row in bestFeatures]
+
+        bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
+        # add suggested target
+        bestFeatures = [*bestFeatures, *inputs_target]
      
+        # drop all values below threshold value   
+        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
+        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
+        result = extract_client.produce(inputs=inputs)        
+
+    def get_params(self) -> Params:
+        return self._params
+
+    def set_params(self, *, params: Params) -> None:
+        self.params = params
+
+    def set_training_data(self, *, inputs: Inputs, outputs: Outputs) -> None:
+        '''
+        Sets primitive's training data
+        Parameters
+        ----------
+        inputs = D3M dataframe
+        '''
+
+        self.num_features = int(inputs.shape[1] * self.hyperparams['proportion_of_features'])        
+
+        # remove primary key and targets from feature selection
+        inputs_primary_key = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/PrimaryKey')
+        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/SuggestedTarget')
+
+        # extract numeric columns and suggested target
+        if self.hyperparams['only_numeric_cols']:
+            inputs_float = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Float')
+            inputs_integer = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Integer')
+            inputs_numeric = [*inputs_float, *inputs_integer]
+            inputs_cols = [x for x in inputs_numeric if x not in inputs_primary_key and x not in inputs_target]
+        else:
+            inputs_cols = [x for x in inputs if x not in inputs_primary_key and x not in inputs_target]
+
+        # generate feature ranking
+        self.rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_cols], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
+
+
     def produce_metafeatures(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
         Perform supervised recursive feature elimination using random forests to generate an ordered
@@ -120,35 +176,19 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         -------
         Outputs : pandas frame with ordered list of original features in first column
         """
-
-        num_features = int(inputs.shape[1] * self.hyperparams['proportion_of_features'])        
-
-        # remove primary key and targets from feature selection
-        inputs_primary_key = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/PrimaryKey')
+        
         inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/SuggestedTarget')
 
-        # extract numeric columns and suggested target
-        if self.hyperparams['only_numeric_cols']:
-            inputs_float = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Float')
-            inputs_integer = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Integer')
-            inputs_numeric = [*inputs_float, *inputs_integer]
-            inputs_cols = [x for x in inputs_numeric if x not in inputs_primary_key and x not in inputs_target]
-        else:
-            inputs_cols = [x for x in inputs if x not in inputs_primary_key and x not in inputs_target]
-
-        # generate feature ranking
-        rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_cols], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
-        # set threshold for the top seven features
-        bestFeatures = rff_features.iloc[0:num_features].values
-        bestFeatures = [row[0] for row in bestFeatures]
-        bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
+        features = [inputs.columns.get_loc(row) for row in self.bestFeatures] # get integer location for each label
         # add suggested target
-        bestFeatures = [*bestFeatures, *inputs_target]
+        features = [*features, *inputs_target]
      
         # drop all values below threshold value   
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
         extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
         result = extract_client.produce(inputs=inputs)
+
+        print(result.value.head(), file=sys.__stdout__)
         
         return result
         

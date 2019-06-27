@@ -29,6 +29,7 @@ pipeline_description.add_step(step_2)
 # Step 2: DISTIL/NK random forest feature selection
 step_3 = PrimitiveStep(primitive=index.get_primitive('d3m.primitives.feature_selection.rffeatures.Rffeatures'))
 step_3.add_argument(name='inputs', argument_type=ArgumentType.CONTAINER, data_reference='steps.2.produce')
+step_3.add_argument(name='outputs', argument_type=ArgumentType.CONTAINER, data_reference='steps.2.produce')
 step_3.add_output('produce')
 pipeline_description.add_step(step_3)
 
