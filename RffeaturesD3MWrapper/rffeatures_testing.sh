@@ -3,12 +3,13 @@
 Datasets=('185_baseball' '1491_one_hundred_plants_margin' 'LL0_1100_popularkids' '38_sick' '4550_MiceProtein' '57_hypothyroid' 'LL0_acled_reduced')
 Bools=('True' 'False')
 cd /primitives/v2019.6.7/Distil/d3m.primitives.feature_selection.rffeatures.Rffeatures/3.1.1/pipelines
-mkdir test_pipeline
-mkdir best_pipelines
+git checkout pca_prim_base
+#mkdir test_pipeline
+#mkdir best_pipelines
 
 # create text file to record scores and timing information
-touch scores.txt
-echo "DATASET, SCORE, FEATURE_PROPORTION, ONLY_NUMERIC, EXECUTION TIME" >> scores.txt
+#touch scores.txt
+#echo "DATASET, SCORE, FEATURE_PROPORTION, ONLY_NUMERIC, EXECUTION TIME" >> scores.txt
 cd test_pipeline
 
 file="/src/rffeaturesd3mwrapper/RffeaturesD3MWrapper/python_pipeline_generator_rffeatures.py"
@@ -20,8 +21,8 @@ sed -i "s/$match/$match\n$insert/" $file
 
 for i in "${Datasets[@]}"; do
   mkdir "../experiments_$i"
-  touch "../experiments_$i/dummy.txt"
-  best_score=0
+  dir="../experiments_$i/*"
+  touch "../experiments_$i/dummy.meta"
   for n in $(seq 1.0 -0.1 0.75); do
     for m in "${Bools[@]}"; do 
 
@@ -51,8 +52,7 @@ for i in "${Datasets[@]}"; do
           echo "$i, $score, $n, $m, $runtime" >> ../scores.txt
           best_score=$score
           echo "$best_score"
-          rm "../experiments_$i/*.meta"
-          rm "../experiments_$i/*.json"
+          rm $dir
           cp *.meta "../experiments_$i/"
           cp *.json "../experiments_$i/"
         fi
