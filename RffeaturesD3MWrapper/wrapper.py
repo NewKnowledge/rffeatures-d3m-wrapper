@@ -25,10 +25,12 @@ Inputs = container.pandas.DataFrame
 Outputs = container.pandas.DataFrame
 
 class Hyperparams(hyperparams.Hyperparams):
-    num_features = hyperparams.UniformInt(lower=1, upper=100, default=5, semantic_types = ['https://metadata.datadrivendiscovery.org/types/TuningParameter'],
-       description = 'number of features to rank')
-    only_numeric_cols = hyperparams.UniformBool(default = True, semantic_types = [
-       'https://metadata.datadrivendiscovery.org/types/ControlParameter'],
+    proportion_of_features = hyperparams.Uniform(lower = 0.0, upper = 1.0, default = 0.0, 
+        upper_inclusive = True, semantic_types = [
+       'https://metadata.datadrivendiscovery.org/types/TuningParameter'], 
+        description = 'proportion of top features from input dataset to keep')
+    only_numeric_cols = hyperparams.UniformBool(default = False, semantic_types = [
+       'https://metadata.datadrivendiscovery.org/types/TuningParameter'],
        description="consider only numeric columns for feature selection")
 
 class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
@@ -37,11 +39,11 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         list of features 
         Parameters
         ----------
-        inputs : Input pandas frame, NOTE: Target column MUST be the last column
+        inputs : Input D3M pandas frame
 
         Returns
         -------
-        Outputs : pandas frame with ordered list of original features in first column
+        Outputs : D3M frame with top num_features selected by algorithm
         """
     metadata = metadata_base.PrimitiveMetadata({
         # Simply an UUID generated once and fixed forever. Generated using "uuid.uuid4()".
@@ -119,9 +121,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         Outputs : pandas frame with ordered list of original features in first column
         """
 
-        if not self.hyperparams:
-            self.hyperparams['num_features'] = 5
-        num_features = self.hyperparams['num_features']        
+        num_features = int(inputs.shape[1] * self.hyperparams['proportion_of_features'])        
 
         # remove primary key and targets from feature selection
         inputs_primary_key = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/PrimaryKey')
@@ -132,9 +132,9 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
             inputs_float = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Float')
             inputs_integer = inputs.metadata.get_columns_with_semantic_type('http://schema.org/Integer')
             inputs_numeric = [*inputs_float, *inputs_integer]
-            inputs_cols = [x for x in inputs_numeric if x not in inputs_primary_key]
+            inputs_cols = [x for x in inputs_numeric if x not in inputs_primary_key and x not in inputs_target]
         else:
-            inputs_cols = [x for x in inputs if x not in inputs_primary_key]
+            inputs_cols = [x for x in inputs if x not in inputs_primary_key and x not in inputs_target]
 
         # generate feature ranking
         rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_cols], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
