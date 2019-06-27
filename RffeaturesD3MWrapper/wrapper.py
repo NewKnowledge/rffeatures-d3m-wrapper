@@ -28,7 +28,7 @@ class Params(params.Params):
     pass
 
 class Hyperparams(hyperparams.Hyperparams):
-    proportion_of_features = hyperparams.Uniform(lower = 0.0, upper = 1.0, default = 0.0, 
+    proportion_of_features = hyperparams.Uniform(lower = 0.0, upper = 1.0, default = 1.0, 
         upper_inclusive = True, semantic_types = [
        'https://metadata.datadrivendiscovery.org/types/TuningParameter'], 
         description = 'proportion of top features from input dataset to keep')
@@ -36,7 +36,7 @@ class Hyperparams(hyperparams.Hyperparams):
        'https://metadata.datadrivendiscovery.org/types/TuningParameter'],
        description="consider only numeric columns for feature selection")
 
-class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
+class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
     """
         Perform supervised recursive feature elimination using random forests to generate an ordered
         list of features 
@@ -97,16 +97,8 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
         '''  
         # set threshold for top features
         self.bestFeatures = self.rff_features.iloc[0:self.num_features].values
-        self.bestFeatures = [row[0] for row in bestFeatures]
-
-        bestFeatures = [inputs.columns.get_loc(row) for row in bestFeatures] # get integer location for each label
-        # add suggested target
-        bestFeatures = [*bestFeatures, *inputs_target]
-     
-        # drop all values below threshold value   
-        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
-        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
-        result = extract_client.produce(inputs=inputs)        
+        self.bestFeatures = [row[0] for row in self.bestFeatures]
+        return CallResult(None)
 
     def get_params(self) -> Params:
         return self._params
@@ -135,7 +127,7 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
             inputs_numeric = [*inputs_float, *inputs_integer]
             inputs_cols = [x for x in inputs_numeric if x not in inputs_primary_key and x not in inputs_target]
         else:
-            inputs_cols = [x for x in inputs if x not in inputs_primary_key and x not in inputs_target]
+            inputs_cols = [x for x in range(inputs.shape[1]) if x not in inputs_primary_key and x not in inputs_target]
 
         # generate feature ranking
         self.rff_features = pandas.DataFrame(RFFeatures().rank_features(inputs = inputs.iloc[:, inputs_cols], targets = pandas.DataFrame(inputs.iloc[:, inputs_target])), columns=['features'])
@@ -185,11 +177,9 @@ class rffeatures(TransformerPrimitiveBase[Inputs, Outputs, Hyperparams]):
      
         # drop all values below threshold value   
         from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
-        extract_client = ExtractColumns(hyperparams={"columns":bestFeatures})
+        extract_client = ExtractColumns(hyperparams={"columns":features})
         result = extract_client.produce(inputs=inputs)
 
-        print(result.value.head(), file=sys.__stdout__)
-        
         return result
         
 if __name__ == '__main__':
