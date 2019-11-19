@@ -1,3 +1,0 @@
-[d3m.primitives]
-feature_selection.rffeatures.Rffeatures = RffeaturesD3MWrapper:rffeatures
-
