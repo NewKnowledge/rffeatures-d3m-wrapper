@@ -176,11 +176,12 @@ class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         features = [*features, *inputs_target]
      
         # drop all values below threshold value   
-        from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
-        extract_client = ExtractColumns(hyperparams={"columns":features})
-        result = extract_client.produce(inputs=inputs)
+        # from d3m.primitives.data_transformation.extract_columns import DataFrameCommon as ExtractColumns
+        # extract_client = ExtractColumns(hyperparams={"columns":features})
+        # result = extract_client.produce(inputs=inputs)
+        result = inputs.select_columns(features)
 
-        return result
+        return CallResult(result)
         
 if __name__ == '__main__':
     # LOAD DATA AND PREPROCESSING

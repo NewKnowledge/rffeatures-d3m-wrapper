@@ -1,0 +1,5 @@
+numpy
+pandas==0.23.4
+requests<=2.20.0,>=2.18.4
+typing
+punk==3.0.0
