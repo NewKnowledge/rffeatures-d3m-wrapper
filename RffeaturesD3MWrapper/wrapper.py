@@ -117,7 +117,7 @@ class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
 
         # remove primary key and targets from feature selection
         inputs_primary_key = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/PrimaryKey')
-        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/SuggestedTarget')
+        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/Target')
 
         # extract numeric columns and suggested target
         if self.hyperparams['only_numeric_cols']:
@@ -168,7 +168,7 @@ class rffeatures(PrimitiveBase[Inputs, Outputs, Params, Hyperparams]):
         Outputs : pandas frame with ordered list of original features in first column
         """
         
-        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/SuggestedTarget')
+        inputs_target = inputs.metadata.get_columns_with_semantic_type('https://metadata.datadrivendiscovery.org/types/Target')
 
         features = [inputs.columns.get_loc(row) for row in self.bestFeatures] # get integer location for each label
         # add suggested target
